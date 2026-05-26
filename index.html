@@ -1,133 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlowchartStudio</title>
-    
+    <link rel="stylesheet" href="styles/main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.4.3/mermaid.min.js"></script>
-
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #0f172a; 
-            color: #e2e8f0; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-        }
-        
-        header { 
-            background: #1e293b; 
-            border-bottom: 1px solid #334155;
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        
-        header h2 { 
-            margin: 0;
-            font-size: 20px;
-            color: #38bdf8; 
-        }
-        
-        .actions { 
-            display: flex; 
-            gap: 12px; 
-            align-items: center; 
-        }
-        
-        button, .upload-btn { 
-            padding: 8px 12px; 
-            border: none; 
-            border-radius: 8px; 
-            background: #0f172a; 
-            color: white; 
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            display: inline-block;
-            transition: all 0.2s ease;
-            border: 1px solid #334155;
-        }
-        
-        button:hover, .upload-btn:hover { 
-            background: #334155;
-            border-color: #94a3b8;
-        }
-
-        .btn-help {
-            background: #1e293b;
-            color: #38bdf8;
-            border-color: #38bdf8;
-        }
-        
-        .btn-active { 
-            background: #38bdf8 !important; 
-            color: #0f172a !important;
-            border-color: #38bdf8 !important;
-        }
-        .btn-active:hover {
-            opacity: 0.9;
-        }
-
-        #file-upload { display: none; }
-
-        .container { display: flex; flex: 1; overflow: hidden; }
-        
-        .editor-side { 
-            width: 40%; 
-            border-right: 1px solid #334155; 
-            display: flex; 
-            flex-direction: column; 
-            background: #1e293b;
-            padding: 10px;
-        }
-        
-        textarea { 
-            flex: 1; 
-            padding: 15px; 
-            font-family: monospace; 
-            font-size: 14px; 
-            border: 1px solid #334155; 
-            border-radius: 8px;
-            resize: none; 
-            outline: none; 
-            background: #0f172a; 
-            color: #e2e8f0;
-            line-height: 1.5; 
-        }
-        textarea:focus {
-            border-color: #38bdf8;
-        }
-        
-        .preview-side { 
-            width: 60%; 
-            padding: 20px; 
-            overflow: auto; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background: #0f172a; 
-        }
-        
-        #canvas-holder { display: none; } 
-        
-        .status-msg {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 5px;
-        }
-    </style>
 </head>
+
 <body>
 
     <header>
         <h2>Multicolor Flowchart Studio</h2>
         <div class="actions">
-            <button class="btn-help" onclick="alert('🎨 MULTICOLOR ARROWS CHEAT SHEET:\n\nTo color individual lines, add this to the bottom of your code:\nlinkStyle INDEX stroke:COLOR,stroke-width:2px;\n\nExample:\nlinkStyle 0 stroke:#22c55e,stroke-width:2px;\n\n(Note: The first arrow drawn is index 0, the next is 1, etc.)')">💡 Arrow Color Code Help</button>
+            <button class="btn-help"
+                onclick="alert('🎨 MULTICOLOR ARROWS CHEAT SHEET:\n\nTo color individual lines, add this to the bottom of your code:\nlinkStyle INDEX stroke:COLOR,stroke-width:2px;\n\nExample:\nlinkStyle 0 stroke:#22c55e,stroke-width:2px;\n\n(Note: The first arrow drawn is index 0, the next is 1, etc.)')">💡
+                Arrow Color Code Help</button>
             <label for="file-upload" class="upload-btn">📁 Upload .md</label>
             <input type="file" id="file-upload" accept=".md,.txt" onchange="handleFileUpload(event)">
             <button class="btn-active" onclick="downloadImage()">💾 Save PNG</button>
@@ -157,7 +46,7 @@
             <div class="status-msg">Changes render automatically. Add line links at the bottom.</div>
         </div>
 
-        
+
         <div class="preview-side" id="preview">
             <div id="graph-target"></div>
         </div>
@@ -165,113 +54,7 @@
 
     <canvas id="canvas-holder"></canvas>
 
-    <script>
-        if (typeof mermaid !== 'undefined') {
-            mermaid.initialize({ 
-                startOnLoad: false, 
-                securityLevel: 'loose',
-                theme: 'base', 
-                themeVariables: {
-                    background: '#0f172a',
-                    mainBkg: '#1e293b',           
-                    nodeBorder: '#334155',        
-                    primaryColor: '#1e293b',
-                    nodeTextColor: '#e2e8f0',     
-                    primaryTextColor: '#e2e8f0',
-                    
-                    // Fallback default arrow color if not specified by linkStyle
-                    lineColor: '#38bdf8',         
-                    textColor: '#38bdf8',         
-                    edgeLabelBackground: '#0f172a'
-                }
-            });
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const mermaidRegex = /```mermaid([\s\S]*?)```/;
-                const match = text.match(mermaidRegex);
-
-                if (match && match[1]) {
-                    document.getElementById('mermaid-input').value = match[1].trim();
-                } else {
-                    document.getElementById('mermaid-input').value = text.trim();
-                }
-                renderDiagram();
-            };
-            reader.readAsText(file);
-        }
-
-        function renderDiagram() {
-            let input = document.getElementById('mermaid-input').value;
-            const preview = document.getElementById('preview');
-            
-            if (!input.trim()) {
-                preview.innerHTML = '';
-                return;
-            }
-
-            if (typeof mermaid === 'undefined') {
-                preview.innerHTML = '<div style="color: #38bdf8;">Loading environment...</div>';
-                return;
-            }
-            
-            if (!input.includes('\n')) {
-                input = input.replace(/([\]\}\)])\s+([A-Za-z0-9])/g, '$1\n$2')
-                             .replace(/(flowchart\s+[A-Z]{2})\s+([A-Za-z0-9])/g, '$1\n$2');
-            }
-
-            try {
-                const uniqueId = 'mermaid-' + Math.floor(Math.random() * 10000);
-                
-                mermaid.render(uniqueId, input, function(svgCode) {
-                    preview.innerHTML = svgCode;
-                });
-                
-            } catch (error) {
-                console.log("Typing layout adjustment...");
-            }
-        }
-
-        function downloadImage() {
-            const svgElement = document.querySelector('#preview svg');
-            if (!svgElement) return alert("No valid diagram to save!");
-
-            const svgString = new XMLSerializer().serializeToString(svgElement);
-            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-            const URL = window.URL || window.webkitURL || window;
-            const blobURL = URL.createObjectURL(svgBlob);
-            
-            const image = new Image();
-            image.onload = function () {
-                const canvas = document.getElementById('canvas-holder');
-                canvas.width = svgElement.getBoundingClientRect().width * 2; 
-                canvas.height = svgElement.getBoundingClientRect().height * 2;
-                
-                const context = canvas.getContext('2d');
-                context.fillStyle = '#0f172a'; 
-                context.fillRect(0, 0, canvas.width, canvas.height);
-                context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                
-                const pngURL = canvas.toDataURL('image/png');
-                const downloadLink = document.createElement('a');
-                downloadLink.download = 'mermaid-flowchart.png';
-                downloadLink.href = pngURL;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            };
-            image.src = blobURL;
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(renderDiagram, 300);
-        });
-    </script>
+    <script type="module" src="src/app.js"></script>
 </body>
+
 </html>
