@@ -15,17 +15,17 @@
         <h2>Multicolor Flowchart Studio</h2>
         <div class="actions">
             <button class="btn-help"
-                onclick="alert('🎨 MULTICOLOR ARROWS CHEAT SHEET:\n\nTo color individual lines, add this to the bottom of your code:\nlinkStyle INDEX stroke:COLOR,stroke-width:2px;\n\nExample:\nlinkStyle 0 stroke:#22c55e,stroke-width:2px;\n\n(Note: The first arrow drawn is index 0, the next is 1, etc.)')">💡
+                onclick="alert('🎨 MULTICOLOR ARROWS CHEAT SHEET:\n\nTo color individual lines, add this to the bottom of your code:\nlinkStyle INDEX stroke:COLOR,stroke-width:2px;\n\nExample:\nlinkStyle 0 stroke:#22c55e,stroke-width:2px;\n\n(Note: The first arrow drawn is index 0, the next is 1, etc.)')">ℹ️
                 Arrow Color Code Help</button>
             <label for="file-upload" class="upload-btn">📁 Upload .md</label>
-            <input type="file" id="file-upload" accept=".md,.txt" onchange="handleFileUpload(event)">
-            <button class="btn-active" onclick="downloadImage()">💾 Save PNG</button>
+            <input type="file" id="file-upload" accept=".md,.txt">
+            <button class="btn-active">💾 Save PNG</button>
         </div>
     </header>
 
     <div class="container">
         <div class="editor-side">
-            <textarea id="mermaid-input" placeholder="Type your mermaid code here..." oninput="renderDiagram()">flowchart LR
+            <textarea id="mermaid-input" placeholder="Type your mermaid code here...">flowchart LR
   Sleep[Sleep] --> Wake{Awake}
   Wake -->|No| Tired --> Sleep
   Wake -->|Hungry| Snack[Get treat] --> Tired --> Sleep
